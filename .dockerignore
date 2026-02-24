@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.env
+*.db
+.pytest_cache/
+.venv/
+venv/
+.git/
+tests/
+AGENT_GUIDE.md

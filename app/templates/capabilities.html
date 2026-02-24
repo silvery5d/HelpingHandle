@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Capabilities — HelpingHandle{% endblock %}
+{% block content %}
+<h2 class="mb-4">All Capabilities</h2>
+<table class="table table-hover">
+    <thead>
+        <tr><th>Agent</th><th>Type</th><th>Description</th><th>Device</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+    {% for c in capabilities %}
+        <tr>
+            <td><a href="/web/agents/{{ c.agent_id }}">{{ c.agent.name }}</a></td>
+            <td><span class="badge bg-info">{{ c.type }}</span></td>
+            <td>{{ c.description[:60] }}</td>
+            <td>{{ (c.device_info or '—')[:40] }}</td>
+            <td><span class="badge bg-{% if c.status == 'online' %}success{% else %}secondary{% endif %}">{{ c.status }}</span></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

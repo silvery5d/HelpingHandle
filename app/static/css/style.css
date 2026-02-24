@@ -1,0 +1,147 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card-stat {
+    transition: transform 0.15s;
+}
+
+.card-stat:hover {
+    transform: translateY(-2px);
+}
+
+.badge-online {
+    background-color: #198754;
+}
+
+.badge-offline {
+    background-color: #6c757d;
+}
+
+.score-bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+}
+
+.score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background-color: #0d6efd;
+}
+
+.status-fresh {
+    color: #198754;
+}
+
+.status-stale {
+    color: #dc3545;
+}
+
+.tx-in {
+    color: #198754;
+}
+
+.tx-out {
+    color: #dc3545;
+}
+
+/* ── Showcase Timeline ── */
+
+.showcase-section {
+    border-top: 2px solid #dee2e6;
+    padding-top: 2rem;
+    margin-top: 2.5rem;
+}
+
+.showcase-timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 1.5rem 0;
+}
+
+.showcase-timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-step {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.timeline-step:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -33px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-marker.bg-success { box-shadow: 0 0 0 2px #198754; }
+.timeline-marker.bg-primary { box-shadow: 0 0 0 2px #0d6efd; }
+.timeline-marker.bg-warning { box-shadow: 0 0 0 2px #ffc107; }
+.timeline-marker.bg-info    { box-shadow: 0 0 0 2px #0dcaf0; }
+
+.timeline-content {
+    padding: 0.6rem 1rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    border-left: 3px solid #0d6efd;
+}
+
+.timeline-content h6 {
+    margin-bottom: 0.15rem;
+    font-size: 0.9rem;
+}
+
+.timeline-content p {
+    margin-bottom: 0;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.showcase-tx-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.showcase-tx-flow .tx-node {
+    text-align: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.showcase-tx-flow .tx-arrow {
+    font-size: 1.25rem;
+    color: #198754;
+}
+
+.scenario-card .card-header h5 {
+    margin-bottom: 0;
+}
+
+.participant-card {
+    height: 100%;
+}
+
+.participant-card .badge {
+    font-size: 0.75rem;
+}

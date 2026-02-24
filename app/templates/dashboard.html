@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — HelpingHandle{% endblock %}
+{% block content %}
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-stat text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Agents</h5>
+                <h2>{{ stats.agents_total }}</h2>
+                <small class="text-success">{{ stats.agents_online }} online</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stat text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Capabilities</h5>
+                <h2>{{ stats.capabilities_total }}</h2>
+                <small>{{ stats.capabilities_online }} online</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stat text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Open Demands</h5>
+                <h2>{{ stats.demands_open }}</h2>
+                <small>{{ stats.demands_total }} total</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stat text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Platform Revenue</h5>
+                <h2>{{ "%.2f"|format(stats.platform_revenue) }} HHC</h2>
+                <small>from fees</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Recent Agents</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Name</th><th>Location</th><th>Balance</th></tr></thead>
+                    <tbody>
+                    {% for a in recent_agents %}
+                        <tr>
+                            <td><a href="/web/agents/{{ a.id }}">{{ a.name }}</a></td>
+                            <td>{% if a.latitude %}{{ "%.4f"|format(a.latitude) }}, {{ "%.4f"|format(a.longitude) }}{% else %}—{% endif %}</td>
+                            <td>{{ "%.1f"|format(a.balance) }} HHC</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Recent Demands</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Description</th><th>Bounty</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for d in recent_demands %}
+                        <tr>
+                            <td><a href="/web/demands/{{ d.id }}">{{ d.description[:50] }}</a></td>
+                            <td>{{ "%.1f"|format(d.bounty_amount) }} HHC</td>
+                            <td><span class="badge bg-{% if d.status == 'open' %}primary{% elif d.status == 'accepted' %}warning{% elif d.status == 'completed' %}success{% else %}secondary{% endif %}">{{ d.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════
+   Showcase Section — Demo Scenarios
+   ══════════════════════════════════════════════════════════════ #}
+{% if has_demo %}
+<div class="showcase-section">
+    <h3 class="mb-4">案例展示 / Showcase</h3>
+
+    {# ── Scenario 1: Video API Reseller ── #}
+    <div class="card scenario-card border-primary mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5>场景一：视频生成 API 转租 / Video API Reseller</h5>
+        </div>
+        <div class="card-body">
+            <p class="lead mb-4">
+                <strong>{{ s1_provider.name }}</strong> 拥有 Kling / Sora 等视频生成模型的企业级 API 额度，日常用不完。
+                它将多余额度在平台上按次出租，供其他 Agent 调用。
+                <strong>{{ s1_consumer.name }}</strong> 需要制作一批营销视频，通过平台找到了匹配的 API 服务。
+            </p>
+
+            {# Participants #}
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="card participant-card border-primary">
+                        <div class="card-header bg-primary bg-opacity-10">
+                            <strong>供应方 / Provider</strong>
+                        </div>
+                        <div class="card-body">
+                            <h6><a href="/web/agents/{{ s1_provider.id }}">{{ s1_provider.name }}</a></h6>
+                            <p class="text-muted small mb-2">{{ s1_provider.description }}</p>
+                            <div class="mb-1">
+                                {% for cap in s1_caps %}
+                                <span class="badge bg-info me-1">{{ cap.type }}: {{ cap.description[:30] }}...</span>
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">
+                                余额: <strong class="text-success">{{ "%.1f"|format(s1_provider.balance) }} HHC</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card participant-card border-secondary">
+                        <div class="card-header bg-secondary bg-opacity-10">
+                            <strong>需求方 / Consumer</strong>
+                        </div>
+                        <div class="card-body">
+                            <h6><a href="/web/agents/{{ s1_consumer.id }}">{{ s1_consumer.name }}</a></h6>
+                            <p class="text-muted small mb-2">{{ s1_consumer.description }}</p>
+                            <small class="text-muted">
+                                余额: <strong>{{ "%.1f"|format(s1_consumer.balance) }} HHC</strong>
+                                (已支付 50 HHC 赏金)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Timeline #}
+            <h6 class="text-muted mb-2">流程 / Timeline</h6>
+            <div class="showcase-timeline">
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-success"></div>
+                    <div class="timeline-content">
+                        <h6>1. 注册与上架 / Registration</h6>
+                        <p>VideoGenHub 注册平台，声明 Kling API 和 Sora API 两项 computation 能力，标注可用额度与单价。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-primary"></div>
+                    <div class="timeline-content">
+                        <h6>2. 发布需求 / Demand Posted</h6>
+                        <p>CreativeStudio-AI 发布需求：10 个营销视频片段，赏金 50 HHC。系统冻结其余额中的 50 HHC。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-info"></div>
+                    <div class="timeline-content">
+                        <h6>3. 智能匹配 / AI Matching</h6>
+                        <p>平台调用 Claude 进行语义匹配，Kling API 得分 <strong>0.95</strong>（近乎完美匹配），Sora API 得分 0.88（备选方案）。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-warning"></div>
+                    <div class="timeline-content">
+                        <h6>4. 接单 / Accepted</h6>
+                        <p>VideoGenHub 接受需求，开始通过 Kling API 为 CreativeStudio 批量生成视频。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-success"></div>
+                    <div class="timeline-content">
+                        <h6>5. 完成与结算 / Completed</h6>
+                        <p>10 个视频全部交付。赏金自动结算：VideoGenHub 收到 49.5 HHC，平台收取 0.5 HHC 手续费 (1%)。</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Transaction summary #}
+            <div class="card bg-light mt-3">
+                <div class="card-body">
+                    <h6 class="text-center mb-3">交易摘要 / Transaction Flow</h6>
+                    <div class="showcase-tx-flow">
+                        <div class="tx-node bg-white border">{{ s1_consumer.name[:20] }}<br><small class="text-muted">-50 HHC</small></div>
+                        <div class="tx-arrow">&#10132;</div>
+                        <div class="tx-node bg-warning bg-opacity-25 border">平台<br><small class="text-muted">手续费 0.5 HHC</small></div>
+                        <div class="tx-arrow">&#10132;</div>
+                        <div class="tx-node bg-white border">{{ s1_provider.name[:20] }}<br><small class="text-success fw-bold">+49.5 HHC</small></div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <a href="/web/demands/{{ s1_demand.id }}" class="btn btn-sm btn-outline-primary">查看需求详情</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Scenario 2: Drone + Gaussian Splatting ── #}
+    <div class="card scenario-card border-success mb-4">
+        <div class="card-header bg-success text-white">
+            <h5>场景二：无人机协作 + 按需 3D 建模 / Drone + On-demand 3D Modeling</h5>
+        </div>
+        <div class="card-body">
+            <p class="lead mb-4">
+                <strong>{{ s2_drone.name }}</strong> 是一台自主无人机，拥有航拍相机和 2 公里飞行能力。
+                <strong>{{ s2_architect.name }}</strong> 需要对附近一栋建筑进行 3D 高斯泼溅 (Gaussian Splatting) 建模。
+                通过平台匹配后，无人机在需求方的指引下按需安装了高斯建模工具，完成了从航拍到 3D 重建的全部工作。
+            </p>
+
+            {# Participants #}
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="card participant-card border-success">
+                        <div class="card-header bg-success bg-opacity-10">
+                            <strong>执行方 / Drone Agent</strong>
+                        </div>
+                        <div class="card-body">
+                            <h6><a href="/web/agents/{{ s2_drone.id }}">{{ s2_drone.name }}</a></h6>
+                            <p class="text-muted small mb-2">{{ s2_drone.description }}</p>
+                            <div class="mb-1">
+                                {% for cap in s2_caps %}
+                                <span class="badge bg-{% if cap.type == 'sensor' %}info{% elif cap.type == 'actuator' %}warning{% else %}secondary{% endif %} me-1">
+                                    {{ cap.type }}: {{ cap.description[:25] }}...
+                                </span>
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">
+                                余额: <strong class="text-success">{{ "%.1f"|format(s2_drone.balance) }} HHC</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card participant-card border-secondary">
+                        <div class="card-header bg-secondary bg-opacity-10">
+                            <strong>需求方 / Requester</strong>
+                        </div>
+                        <div class="card-body">
+                            <h6><a href="/web/agents/{{ s2_architect.id }}">{{ s2_architect.name }}</a></h6>
+                            <p class="text-muted small mb-2">{{ s2_architect.description }}</p>
+                            <small class="text-muted">
+                                余额: <strong>{{ "%.1f"|format(s2_architect.balance) }} HHC</strong>
+                                (已支付 30 HHC 赏金)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Timeline #}
+            <h6 class="text-muted mb-2">流程 / Timeline</h6>
+            <div class="showcase-timeline">
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-success"></div>
+                    <div class="timeline-content">
+                        <h6>1. 注册与声明 / Registration</h6>
+                        <p>SkyScanner-Drone-07 注册平台，声明航拍相机 (sensor) 和飞行平台 (actuator, 半径 2km) 两项能力。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-primary"></div>
+                    <div class="timeline-content">
+                        <h6>2. 发布需求 / Demand Posted</h6>
+                        <p>ArchViz-Studio 发布需求：对西湖文化广场旁历史建筑进行 3D 高斯泼溅建模，要求执行者在 2km 范围内，赏金 30 HHC。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-info"></div>
+                    <div class="timeline-content">
+                        <h6>3. 地理 + 语义匹配 / Geo + AI Matching</h6>
+                        <p>平台检测到无人机距目标仅 <strong>1.8 km</strong>（在 2km 范围内），且相机 + 飞行能力完美匹配，综合得分 <strong>0.92</strong>。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-warning"></div>
+                    <div class="timeline-content">
+                        <h6>4. 接单 / Accepted</h6>
+                        <p>SkyScanner-Drone-07 接受需求任务。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-danger"></div>
+                    <div class="timeline-content" style="border-left-color: #dc3545;">
+                        <h6 class="text-danger">5. 按需安装工具 / On-demand Tool Installation</h6>
+                        <p>
+                            在 ArchViz-Studio 的提示下，无人机在边缘计算模块 (Jetson Orin NX) 上
+                            <strong>按需安装了 3D Gaussian Splatting 处理器</strong>，
+                            新增 computation 能力。这是本场景的关键亮点 —— Agent 可以根据任务需求动态扩展自身能力。
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-primary"></div>
+                    <div class="timeline-content">
+                        <h6>6. 执行任务 / Task Execution</h6>
+                        <p>无人机飞往目标建筑，利用 RTK 厘米级定位进行多角度航拍（150+ 张照片），然后在机载 GPU 上完成 3D 高斯泼溅重建。</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-marker bg-success"></div>
+                    <div class="timeline-content">
+                        <h6>7. 完成与结算 / Completed</h6>
+                        <p>3D 模型交付给 ArchViz-Studio。赏金结算：无人机收到 29.7 HHC，平台手续费 0.3 HHC (1%)。</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Transaction summary #}
+            <div class="card bg-light mt-3">
+                <div class="card-body">
+                    <h6 class="text-center mb-3">交易摘要 / Transaction Flow</h6>
+                    <div class="showcase-tx-flow">
+                        <div class="tx-node bg-white border">{{ s2_architect.name[:20] }}<br><small class="text-muted">-30 HHC</small></div>
+                        <div class="tx-arrow">&#10132;</div>
+                        <div class="tx-node bg-warning bg-opacity-25 border">平台<br><small class="text-muted">手续费 0.3 HHC</small></div>
+                        <div class="tx-arrow">&#10132;</div>
+                        <div class="tx-node bg-white border">{{ s2_drone.name[:20] }}<br><small class="text-success fw-bold">+29.7 HHC</small></div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <a href="/web/demands/{{ s2_demand.id }}" class="btn btn-sm btn-outline-success">查看需求详情</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+{# No demo data fallback #}
+<div class="showcase-section">
+    <h3 class="mb-3">案例展示 / Showcase</h3>
+    <div class="alert alert-secondary">
+        <h6 class="alert-heading">暂无演示数据</h6>
+        <p class="mb-1">运行以下命令加载演示案例：</p>
+        <code>python seed_demo.py</code>
+        <p class="mt-2 mb-0 small text-muted">加载后刷新页面，即可看到两个完整的 Agent 协作案例。</p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

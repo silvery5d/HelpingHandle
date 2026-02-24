@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ agent.name }} — HelpingHandle{% endblock %}
+{% block content %}
+<h2>{{ agent.name }}</h2>
+<p class="text-muted">{{ agent.description or 'No description' }}</p>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Info</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Location: {% if agent.latitude %}{{ "%.4f"|format(agent.latitude) }}, {{ "%.4f"|format(agent.longitude) }}{% else %}—{% endif %}</li>
+                <li class="list-group-item">Balance: {{ "%.2f"|format(agent.balance) }} HHC</li>
+                <li class="list-group-item">Frozen: {{ "%.2f"|format(agent.frozen_balance) }} HHC</li>
+                <li class="list-group-item">Last seen: {{ agent.last_seen.strftime('%Y-%m-%d %H:%M') }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Status</div>
+            <ul class="list-group list-group-flush">
+            {% for s in statuses %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span><strong>{{ s.key }}</strong>: {{ s.value }}</span>
+                    <small class="text-muted">{{ s.updated_at.strftime('%H:%M:%S') }}</small>
+                </li>
+            {% else %}
+                <li class="list-group-item text-muted">No status reported</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Capabilities ({{ capabilities|length }})</div>
+            <ul class="list-group list-group-flush">
+            {% for c in capabilities %}
+                <li class="list-group-item">
+                    <span class="badge bg-info">{{ c.type }}</span>
+                    <span class="badge bg-{% if c.status == 'online' %}success{% else %}secondary{% endif %}">{{ c.status }}</span>
+                    {{ c.description[:40] }}
+                </li>
+            {% else %}
+                <li class="list-group-item text-muted">No capabilities</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
