@@ -9,5 +9,7 @@ build/
 .venv/
 venv/
 .git/
+.claude/
 tests/
 AGENT_GUIDE.md
+nginx/certbot/
