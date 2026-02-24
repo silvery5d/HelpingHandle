@@ -4,7 +4,7 @@
 <h2 class="mb-4">Registered Agents</h2>
 <table class="table table-hover">
     <thead>
-        <tr><th>Name</th><th>Description</th><th>Location</th><th>Balance</th><th>Capabilities</th><th>Last Seen</th></tr>
+        <tr><th>Name</th><th>Description</th><th>Location</th><th>Capabilities</th><th>Last Seen</th></tr>
     </thead>
     <tbody>
     {% for a in agents %}
@@ -12,7 +12,6 @@
             <td><a href="/web/agents/{{ a.id }}">{{ a.name }}</a></td>
             <td>{{ (a.description or '—')[:60] }}</td>
             <td>{% if a.latitude %}{{ "%.4f"|format(a.latitude) }}, {{ "%.4f"|format(a.longitude) }}{% else %}—{% endif %}</td>
-            <td>{{ "%.1f"|format(a.balance) }} HHC</td>
             <td>{{ a.capabilities|length }}</td>
             <td>{{ a.last_seen.strftime('%Y-%m-%d %H:%M') }}</td>
         </tr>

@@ -4,14 +4,13 @@
 <h2 class="mb-4">All Demands</h2>
 <table class="table table-hover">
     <thead>
-        <tr><th>Description</th><th>Requester</th><th>Bounty</th><th>Status</th><th>Created</th></tr>
+        <tr><th>Description</th><th>Requester</th><th>Status</th><th>Created</th></tr>
     </thead>
     <tbody>
     {% for d in demands %}
         <tr>
             <td><a href="/web/demands/{{ d.id }}">{{ d.description[:60] }}</a></td>
             <td><a href="/web/agents/{{ d.requester_agent_id }}">{{ d.requester_agent.name }}</a></td>
-            <td>{{ "%.1f"|format(d.bounty_amount) }} HHC</td>
             <td><span class="badge bg-{% if d.status == 'open' %}primary{% elif d.status == 'accepted' %}warning{% elif d.status == 'completed' %}success{% else %}secondary{% endif %}">{{ d.status }}</span></td>
             <td>{{ d.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
         </tr>

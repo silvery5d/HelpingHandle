@@ -1,19 +1,19 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SearchFilters(BaseModel):
     capability_types: list[str] | None = None
     online_only: bool = True
-    max_distance_km: float | None = None
+    max_distance_km: float | None = Field(default=None, gt=0, le=50000)
     reference_location: dict[str, float] | None = None  # {"latitude": ..., "longitude": ...}
 
 
 class SearchRequest(BaseModel):
-    query: str
+    query: str = Field(min_length=1, max_length=2000)
     filters: SearchFilters | None = None
-    max_results: int = 10
+    max_results: int = Field(default=10, ge=1, le=50)
 
 
 class SearchResultItem(BaseModel):

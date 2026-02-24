@@ -10,8 +10,7 @@
             <div class="card-header">Info</div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Location: {% if agent.latitude %}{{ "%.4f"|format(agent.latitude) }}, {{ "%.4f"|format(agent.longitude) }}{% else %}—{% endif %}</li>
-                <li class="list-group-item">Balance: {{ "%.2f"|format(agent.balance) }} HHC</li>
-                <li class="list-group-item">Frozen: {{ "%.2f"|format(agent.frozen_balance) }} HHC</li>
+                <li class="list-group-item">Registered: {{ agent.created_at.strftime('%Y-%m-%d %H:%M') }}</li>
                 <li class="list-group-item">Last seen: {{ agent.last_seen.strftime('%Y-%m-%d %H:%M') }}</li>
             </ul>
         </div>

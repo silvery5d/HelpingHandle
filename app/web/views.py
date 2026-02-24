@@ -31,9 +31,7 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
         "capabilities_online": db.query(Capability).filter(Capability.status == CapabilityStatus.ONLINE.value).count(),
         "demands_open": db.query(Demand).filter(Demand.status == DemandStatus.OPEN.value).count(),
         "demands_total": db.query(Demand).count(),
-        "platform_revenue": db.query(func.coalesce(func.sum(Transaction.amount), 0.0)).filter(
-            Transaction.type == TransactionType.PLATFORM_FEE.value
-        ).scalar(),
+        "demands_completed": db.query(Demand).filter(Demand.status == DemandStatus.COMPLETED.value).count(),
     }
 
     recent_agents = db.query(Agent).order_by(Agent.created_at.desc()).limit(10).all()

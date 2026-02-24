@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.auth.api_key import get_current_agent
 from app.database import get_db
+from app.limiter import limiter
 from app.models.agent import Agent
 from app.schemas.capability import (
     CapabilityCreate,
@@ -36,7 +37,8 @@ def _to_response(cap) -> CapabilityResponse:
 
 
 @router.post("", response_model=CapabilityResponse, status_code=status.HTTP_201_CREATED)
-def create(data: CapabilityCreate, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
+@limiter.limit("20/hour")
+def create(request: Request, data: CapabilityCreate, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
     cap = create_capability(db, agent.id, data)
     return _to_response(cap)
 

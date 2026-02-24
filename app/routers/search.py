@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.auth.api_key import get_current_agent
 from app.database import get_db
+from app.limiter import limiter
 from app.models.agent import Agent
 from app.schemas.search import SearchRequest, SearchResponse, SearchResultItem
 from app.services.matching_service import semantic_search
@@ -11,7 +12,9 @@ router = APIRouter(prefix="/api/search", tags=["search"])
 
 
 @router.post("/capabilities", response_model=SearchResponse)
+@limiter.limit("10/hour")
 def search_capabilities(
+    request: Request,
     data: SearchRequest,
     agent: Agent = Depends(get_current_agent),
     db: Session = Depends(get_db),

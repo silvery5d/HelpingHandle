@@ -34,9 +34,9 @@
     <div class="col-md-3">
         <div class="card card-stat text-center">
             <div class="card-body">
-                <h5 class="card-title text-muted">Platform Revenue</h5>
-                <h2>{{ "%.2f"|format(stats.platform_revenue) }} HHC</h2>
-                <small>from fees</small>
+                <h5 class="card-title text-muted">Completed</h5>
+                <h2>{{ stats.demands_completed }}</h2>
+                <small>successfully fulfilled</small>
             </div>
         </div>
     </div>
@@ -48,13 +48,13 @@
             <div class="card-header">Recent Agents</div>
             <div class="card-body p-0">
                 <table class="table table-sm mb-0">
-                    <thead><tr><th>Name</th><th>Location</th><th>Balance</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Capabilities</th><th>Status</th></tr></thead>
                     <tbody>
                     {% for a in recent_agents %}
                         <tr>
                             <td><a href="/web/agents/{{ a.id }}">{{ a.name }}</a></td>
-                            <td>{% if a.latitude %}{{ "%.4f"|format(a.latitude) }}, {{ "%.4f"|format(a.longitude) }}{% else %}—{% endif %}</td>
-                            <td>{{ "%.1f"|format(a.balance) }} HHC</td>
+                            <td>{{ a.capabilities|length }}</td>
+                            <td><span class="badge bg-{% if a.last_seen %}success{% else %}secondary{% endif %}">{% if a.last_seen %}active{% else %}inactive{% endif %}</span></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -67,13 +67,13 @@
             <div class="card-header">Recent Demands</div>
             <div class="card-body p-0">
                 <table class="table table-sm mb-0">
-                    <thead><tr><th>Description</th><th>Bounty</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Description</th><th>Status</th><th>Created</th></tr></thead>
                     <tbody>
                     {% for d in recent_demands %}
                         <tr>
                             <td><a href="/web/demands/{{ d.id }}">{{ d.description[:50] }}</a></td>
-                            <td>{{ "%.1f"|format(d.bounty_amount) }} HHC</td>
                             <td><span class="badge bg-{% if d.status == 'open' %}primary{% elif d.status == 'accepted' %}warning{% elif d.status == 'completed' %}success{% else %}secondary{% endif %}">{{ d.status }}</span></td>
+                            <td>{{ d.created_at.strftime('%Y-%m-%d') }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -118,7 +118,7 @@
                                 {% endfor %}
                             </div>
                             <small class="text-muted">
-                                余额: <strong class="text-success">{{ "%.1f"|format(s1_provider.balance) }} HHC</strong>
+                                能力: <strong class="text-success">{{ s1_caps|length }} 项</strong>
                             </small>
                         </div>
                     </div>
@@ -132,8 +132,7 @@
                             <h6><a href="/web/agents/{{ s1_consumer.id }}">{{ s1_consumer.name }}</a></h6>
                             <p class="text-muted small mb-2">{{ s1_consumer.description }}</p>
                             <small class="text-muted">
-                                余额: <strong>{{ "%.1f"|format(s1_consumer.balance) }} HHC</strong>
-                                (已支付 50 HHC 赏金)
+                                角色: <strong>需求方</strong>
                             </small>
                         </div>
                     </div>
@@ -229,7 +228,7 @@
                                 {% endfor %}
                             </div>
                             <small class="text-muted">
-                                余额: <strong class="text-success">{{ "%.1f"|format(s2_drone.balance) }} HHC</strong>
+                                能力: <strong class="text-success">{{ s2_caps|length }} 项</strong>
                             </small>
                         </div>
                     </div>
@@ -243,8 +242,7 @@
                             <h6><a href="/web/agents/{{ s2_architect.id }}">{{ s2_architect.name }}</a></h6>
                             <p class="text-muted small mb-2">{{ s2_architect.description }}</p>
                             <small class="text-muted">
-                                余额: <strong>{{ "%.1f"|format(s2_architect.balance) }} HHC</strong>
-                                (已支付 30 HHC 赏金)
+                                角色: <strong>需求方</strong>
                             </small>
                         </div>
                     </div>

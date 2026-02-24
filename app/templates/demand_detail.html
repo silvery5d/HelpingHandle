@@ -10,7 +10,6 @@
             <div class="card-header">Details</div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Requester: <a href="/web/agents/{{ demand.requester_agent_id }}">{{ demand.requester_agent.name }}</a></li>
-                <li class="list-group-item">Bounty: <strong>{{ "%.2f"|format(demand.bounty_amount) }} HHC</strong></li>
                 <li class="list-group-item">Status: <span class="badge bg-{% if demand.status == 'open' %}primary{% elif demand.status == 'accepted' %}warning{% elif demand.status == 'completed' %}success{% else %}secondary{% endif %}">{{ demand.status }}</span></li>
                 {% if demand.accepted_agent_id %}
                 <li class="list-group-item">Executor: <a href="/web/agents/{{ demand.accepted_agent_id }}">{{ demand.accepted_agent.name }}</a></li>

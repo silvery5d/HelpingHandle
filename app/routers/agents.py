@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.auth.api_key import get_current_agent
 from app.database import get_db
+from app.limiter import limiter
 from app.models.agent import Agent
 from app.schemas.agent import (
     AgentCreate,
@@ -25,7 +26,8 @@ def _to_location(agent: Agent) -> LocationSchema | None:
 
 
 @router.post("/register", response_model=AgentRegistered, status_code=status.HTTP_201_CREATED)
-def register(data: AgentCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def register(request: Request, data: AgentCreate, db: Session = Depends(get_db)):
     agent, raw_key = register_agent(db, data)
     return AgentRegistered(
         id=agent.id,
@@ -55,7 +57,8 @@ def get_me(agent: Agent = Depends(get_current_agent)):
 
 
 @router.patch("/me", response_model=AgentResponse)
-def update_me(data: AgentUpdate, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
+@limiter.limit("30/hour")
+def update_me(request: Request, data: AgentUpdate, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
     agent = update_agent(db, agent, data)
     return AgentResponse(
         id=agent.id,

@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     platform_fee_rate: float = 0.01
     required_verifiers: int = 5
 
+    allowed_origins: list[str] = ["https://helpinghandle.ai"]
+
     host: str = "0.0.0.0"
     port: int = 8000
 

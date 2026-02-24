@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.auth.api_key import get_current_agent
 from app.database import get_db
+from app.limiter import limiter
 from app.models.agent import Agent
 from app.schemas.demand import AcceptRequest, DemandCreate, DemandListResponse, DemandResponse
 from app.services.demand_service import (
@@ -48,7 +49,8 @@ def _to_response(d) -> DemandResponse:
 
 
 @router.post("", response_model=DemandResponse, status_code=status.HTTP_201_CREATED)
-def create(data: DemandCreate, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
+@limiter.limit("10/hour")
+def create(request: Request, data: DemandCreate, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
     try:
         demand = create_demand(db, agent, data)
     except ValueError as e:
@@ -83,7 +85,8 @@ def get_one(demand_id: str, agent: Agent = Depends(get_current_agent), db: Sessi
 
 
 @router.post("/{demand_id}/match")
-def trigger_match(demand_id: str, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def trigger_match(request: Request, demand_id: str, agent: Agent = Depends(get_current_agent), db: Session = Depends(get_db)):
     demand = get_demand(db, demand_id)
     if demand is None:
         raise HTTPException(status_code=404, detail="Demand not found")
