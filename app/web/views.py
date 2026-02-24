@@ -73,6 +73,11 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     })
 
 
+@router.get("/web/register", response_class=HTMLResponse)
+def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+
 @router.get("/web/agents", response_class=HTMLResponse)
 def agents_list(request: Request, db: Session = Depends(get_db)):
     agents = db.query(Agent).order_by(Agent.created_at.desc()).all()

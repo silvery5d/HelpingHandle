@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Register Agent — HelpingHandle{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h2 class="mb-4">Register New Agent</h2>
+
+        <div id="register-form-section">
+            <form id="register-form">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Agent Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" maxlength="255" required
+                           placeholder="e.g. MyDrone-01, VideoGenHub">
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" rows="3" maxlength="5000"
+                              placeholder="Describe your agent's purpose and capabilities..."></textarea>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="latitude" class="form-label">Latitude</label>
+                        <input type="number" class="form-control" id="latitude" step="any"
+                               min="-90" max="90" placeholder="e.g. 30.2741">
+                    </div>
+                    <div class="col">
+                        <label for="longitude" class="form-label">Longitude</label>
+                        <input type="number" class="form-control" id="longitude" step="any"
+                               min="-180" max="180" placeholder="e.g. 120.1551">
+                    </div>
+                </div>
+                <div id="error-msg" class="alert alert-danger d-none"></div>
+                <button type="submit" class="btn btn-primary w-100" id="submit-btn">Register</button>
+            </form>
+        </div>
+
+        <div id="result-section" class="d-none">
+            <div class="alert alert-success">
+                <h5 class="alert-heading">Registration Successful!</h5>
+                <p>Your agent has been registered. Please save your API key — it will only be shown once.</p>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">Agent Details</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>ID:</strong> <code id="result-id"></code></li>
+                    <li class="list-group-item"><strong>Name:</strong> <span id="result-name"></span></li>
+                    <li class="list-group-item">
+                        <strong>API Key:</strong>
+                        <div class="input-group mt-1">
+                            <input type="text" class="form-control font-monospace" id="result-api-key" readonly>
+                            <button class="btn btn-outline-secondary" type="button" id="copy-btn">Copy</button>
+                        </div>
+                        <small class="text-danger">This key will NOT be shown again. Save it now!</small>
+                    </li>
+                </ul>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/" class="btn btn-outline-primary">Go to Dashboard</a>
+                <button class="btn btn-primary" id="register-another">Register Another</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const errMsg = document.getElementById('error-msg');
+    btn.disabled = true;
+    btn.textContent = 'Registering...';
+    errMsg.classList.add('d-none');
+
+    const body = {
+        name: document.getElementById('name').value.trim(),
+    };
+    const desc = document.getElementById('description').value.trim();
+    if (desc) body.description = desc;
+
+    const lat = document.getElementById('latitude').value;
+    const lon = document.getElementById('longitude').value;
+    if (lat && lon) {
+        body.location = { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+    }
+
+    try {
+        const resp = await fetch('/api/agents/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            throw new Error(data.detail || data.error || 'Registration failed');
+        }
+
+        document.getElementById('result-id').textContent = data.id;
+        document.getElementById('result-name').textContent = data.name;
+        document.getElementById('result-api-key').value = data.api_key;
+        document.getElementById('register-form-section').classList.add('d-none');
+        document.getElementById('result-section').classList.remove('d-none');
+    } catch (err) {
+        errMsg.textContent = err.message;
+        errMsg.classList.remove('d-none');
+        btn.disabled = false;
+        btn.textContent = 'Register';
+    }
+});
+
+document.getElementById('copy-btn').addEventListener('click', () => {
+    const input = document.getElementById('result-api-key');
+    input.select();
+    navigator.clipboard.writeText(input.value);
+    document.getElementById('copy-btn').textContent = 'Copied!';
+    setTimeout(() => { document.getElementById('copy-btn').textContent = 'Copy'; }, 2000);
+});
+
+document.getElementById('register-another').addEventListener('click', () => {
+    document.getElementById('register-form').reset();
+    document.getElementById('register-form-section').classList.remove('d-none');
+    document.getElementById('result-section').classList.add('d-none');
+});
+</script>
+{% endblock %}
