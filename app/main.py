@@ -11,7 +11,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.database import Base, engine
-from app.limiter import limiter
+from app.limiter import ip_limiter, limiter
 
 logging.basicConfig(level=logging.DEBUG if settings.debug else logging.INFO)
 
@@ -31,6 +31,7 @@ app = FastAPI(
 )
 
 app.state.limiter = limiter
+app.state.ip_limiter = ip_limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(

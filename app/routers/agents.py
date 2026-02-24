@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.api_key import get_current_agent
 from app.database import get_db
-from app.limiter import limiter
+from app.limiter import ip_limiter, limiter
 from app.models.agent import Agent
 from app.schemas.agent import (
     AgentCreate,
@@ -26,7 +26,7 @@ def _to_location(agent: Agent) -> LocationSchema | None:
 
 
 @router.post("/register", response_model=AgentRegistered, status_code=status.HTTP_201_CREATED)
-@limiter.limit("5/hour")
+@ip_limiter.limit("5/hour")
 def register(request: Request, data: AgentCreate, db: Session = Depends(get_db)):
     agent, raw_key = register_agent(db, data)
     return AgentRegistered(

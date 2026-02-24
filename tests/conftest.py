@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
-from app.limiter import limiter
+from app.limiter import ip_limiter, limiter
 from app.main import app
 
 engine = create_engine(
@@ -43,8 +43,10 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 def reset_rate_limiter():
     """Disable rate limiting during tests."""
     limiter.enabled = False
+    ip_limiter.enabled = False
     yield
     limiter.enabled = True
+    ip_limiter.enabled = True
 
 
 @pytest.fixture()
