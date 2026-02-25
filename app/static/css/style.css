@@ -12,7 +12,7 @@
     --hh-dark: #111827;
     --hh-dark-600: #1f2937;
     --hh-dark-500: #374151;
-    --hh-gray-100: #f3f4f6;
+    --hh-gray-100: #f0f2f5;
     --hh-gray-200: #e5e7eb;
     --hh-gray-300: #d1d5db;
     --hh-gray-400: #9ca3af;
@@ -24,11 +24,16 @@
     --hh-shadow-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -1px rgba(0,0,0,.04);
     --hh-shadow-lg: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -2px rgba(0,0,0,.03);
     --hh-transition: 0.2s cubic-bezier(.4,0,.2,1);
+
+    /* Override Bootstrap CSS variables */
+    --bs-body-bg: #f0f2f5;
+    --bs-body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --bs-body-color: #111827;
 }
 
 /* ── Global ── */
 body {
-    background-color: var(--hh-gray-100);
+    background-color: #f0f2f5 !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--hh-dark);
     line-height: 1.6;
@@ -50,8 +55,8 @@ a:hover {
 }
 
 /* ── Navbar ── */
-.navbar-hh {
-    background: linear-gradient(135deg, var(--hh-dark) 0%, var(--hh-dark-600) 100%);
+nav.navbar.navbar-hh {
+    background: linear-gradient(135deg, #111827 0%, #1f2937 100%) !important;
     border-bottom: 1px solid rgba(255,255,255,.06);
     padding: 0.6rem 0;
     box-shadow: 0 2px 8px rgba(0,0,0,.15);
@@ -125,6 +130,7 @@ a:hover {
 
 /* ── Cards ── */
 .card {
+    background-color: #fff !important;
     border: 1px solid var(--hh-gray-200);
     border-radius: var(--hh-radius);
     box-shadow: var(--hh-shadow);
@@ -137,7 +143,7 @@ a:hover {
 }
 
 .card-header {
-    background-color: #fff;
+    background-color: #fafbfc !important;
     border-bottom: 1px solid var(--hh-gray-200);
     font-weight: 600;
     font-size: 0.9rem;
@@ -150,7 +156,7 @@ a:hover {
     border: 1px solid var(--hh-gray-200);
     border-radius: var(--hh-radius);
     transition: all var(--hh-transition);
-    background: #fff;
+    background: #fff !important;
     position: relative;
     overflow: hidden;
 }
@@ -214,12 +220,13 @@ a:hover {
 
 /* ── Hero Banner ── */
 .hero-banner {
-    background: linear-gradient(135deg, var(--hh-dark) 0%, var(--hh-dark-600) 50%, var(--hh-dark-500) 100%);
+    background: linear-gradient(135deg, #111827 0%, #1f2937 50%, #374151 100%) !important;
     border-radius: var(--hh-radius);
     padding: 2.5rem 2rem;
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(255,255,255,.06);
+    color: #fff;
 }
 
 .hero-banner::before {
@@ -294,8 +301,8 @@ a:hover {
 }
 
 .table thead th {
-    background-color: var(--hh-gray-100);
-    border-bottom: 2px solid var(--hh-gray-200);
+    background-color: #f0f2f5 !important;
+    border-bottom: 2px solid var(--hh-gray-200) !important;
     font-weight: 600;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -676,4 +683,270 @@ a:hover {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--hh-gray-400);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   High-tech Dynamic Effects
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Animated Grid Background on Hero ── */
+.hero-banner {
+    background-image:
+        linear-gradient(rgba(26,86,219,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,86,219,.07) 1px, transparent 1px),
+        linear-gradient(135deg, #111827 0%, #1f2937 50%, #374151 100%) !important;
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+    animation: gridShift 20s linear infinite;
+}
+
+@keyframes gridShift {
+    0%   { background-position: 0 0, 0 0, 0 0; }
+    100% { background-position: 40px 40px, 40px 40px, 0 0; }
+}
+
+/* ── Glowing Pulse on Hero Banner Orbs ── */
+.hero-banner::before {
+    animation: orbFloat 8s ease-in-out infinite;
+}
+
+.hero-banner::after {
+    animation: orbFloat 10s ease-in-out infinite reverse;
+}
+
+@keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+    50%      { transform: translate(20px, -15px) scale(1.1); opacity: 0.7; }
+}
+
+/* ── Scan Line on Hero ── */
+.hero-banner > .scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16,185,129,.4), transparent);
+    animation: scanDown 4s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes scanDown {
+    0%   { top: 0; opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+/* ── Typing Cursor on Hero Command ── */
+.hero-cmd::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: var(--hh-accent);
+    margin-left: 4px;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+}
+
+/* ── Stat Card Glow on Hover ── */
+.card-stat.stat-agents:hover    { box-shadow: 0 0 20px rgba(26,86,219,.15), var(--hh-shadow-lg); }
+.card-stat.stat-capabilities:hover { box-shadow: 0 0 20px rgba(139,92,246,.15), var(--hh-shadow-lg); }
+.card-stat.stat-demands:hover   { box-shadow: 0 0 20px rgba(245,158,11,.15), var(--hh-shadow-lg); }
+.card-stat.stat-completed:hover { box-shadow: 0 0 20px rgba(16,185,129,.15), var(--hh-shadow-lg); }
+
+/* ── Animated Top Border on Stat Cards ── */
+.card-stat::before {
+    transition: width 0.4s ease;
+    width: 100%;
+}
+
+.card-stat:hover::before {
+    animation: borderGlow 2s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+/* ── How-Step Hover Glow ── */
+.how-step:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(26,86,219,.1);
+    border-color: rgba(26,86,219,.2);
+}
+
+.how-step:hover .how-step-num {
+    animation: numPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes numPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(26,86,219,.2); }
+    50%      { box-shadow: 0 0 0 8px rgba(26,86,219,0); }
+}
+
+/* ── Scroll Fade-In Animations ── */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.fade-in-left {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.fade-in-right {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* stagger children */
+.stagger-children > *:nth-child(1) { transition-delay: 0s; }
+.stagger-children > *:nth-child(2) { transition-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { transition-delay: 0.2s; }
+.stagger-children > *:nth-child(4) { transition-delay: 0.3s; }
+
+/* ── Timeline Marker Pulse ── */
+.timeline-marker {
+    animation: markerPulse 3s ease-in-out infinite;
+}
+
+@keyframes markerPulse {
+    0%, 100% { box-shadow: 0 0 0 2px currentColor; }
+    50%      { box-shadow: 0 0 0 4px currentColor, 0 0 8px currentColor; }
+}
+
+/* ── Timeline Line Glow ── */
+.showcase-timeline::before {
+    background: linear-gradient(180deg, var(--hh-primary), var(--hh-accent), var(--hh-primary));
+    background-size: 100% 200%;
+    animation: lineGlow 4s linear infinite;
+}
+
+@keyframes lineGlow {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 200%; }
+}
+
+/* ── Transaction Arrow Animation ── */
+.showcase-tx-flow .tx-arrow {
+    animation: arrowPulse 2s ease-in-out infinite;
+}
+
+@keyframes arrowPulse {
+    0%, 100% { opacity: 1; transform: translateX(0); }
+    50%      { opacity: 0.5; transform: translateX(3px); }
+}
+
+/* ── Register Button Glow ── */
+.navbar-hh .btn-register {
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar-hh .btn-register::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255,255,255,.1) 50%,
+        transparent 70%
+    );
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%   { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* ── Copy Button Success Flash ── */
+@keyframes flashGreen {
+    0%   { background-color: #10b981; }
+    100% { background-color: #198754; }
+}
+
+/* ── Navbar Brand Icon Rotate on Hover ── */
+.navbar-hh .brand-icon {
+    transition: transform 0.4s ease;
+}
+
+.navbar-hh .navbar-brand:hover .brand-icon {
+    transform: rotate(360deg);
+}
+
+/* ── Data Flow Dots (decorative) ── */
+@keyframes dataFlow {
+    0%   { transform: translateY(0); opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(-20px); opacity: 0; }
+}
+
+/* ── Score Bar Fill Animation ── */
+.score-bar-fill {
+    animation: fillBar 1.2s ease-out;
+}
+
+@keyframes fillBar {
+    0%   { width: 0; }
+}
+
+/* ── Footer Link Underline Effect ── */
+.footer-links a {
+    position: relative;
+}
+
+.footer-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background: var(--hh-primary);
+    transition: width 0.3s ease;
+}
+
+.footer-links a:hover::after {
+    width: 100%;
+}
+
+/* ── Reduce Motion for Accessibility ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
