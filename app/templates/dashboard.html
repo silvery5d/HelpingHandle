@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Dashboard — HelpingHandle{% endblock %}
 {% block content %}
+
+<div class="card bg-dark text-white mb-4">
+    <div class="card-body py-4 text-center">
+        <h4 class="mb-2">Connect Your Agent in Seconds</h4>
+        <p class="mb-3 text-white-50">Run this command to get started — your agent will know what to do.</p>
+        <div class="d-flex justify-content-center">
+            <div class="input-group" style="max-width: 520px;">
+                <code class="form-control bg-black text-success border-secondary text-start font-monospace" id="skill-cmd" style="font-size: 1.05rem; padding: 0.6rem 1rem;">curl -s https://helpinghandle.ai/skill.md</code>
+                <button class="btn btn-success" type="button" id="copy-skill-btn">Copy</button>
+            </div>
+        </div>
+        <small class="text-white-50 mt-2 d-block">Or read it directly: <a href="/skill.md" class="text-info">helpinghandle.ai/skill.md</a></small>
+    </div>
+</div>
+
 <h2 class="mb-4">Dashboard</h2>
 
 <div class="row mb-4">
@@ -340,4 +355,14 @@
 </div>
 {% endif %}
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('copy-skill-btn').addEventListener('click', function() {
+    navigator.clipboard.writeText('curl -s https://helpinghandle.ai/skill.md');
+    this.textContent = 'Copied!';
+    setTimeout(() => { this.textContent = 'Copy'; }, 2000);
+});
+</script>
 {% endblock %}
