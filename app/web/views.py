@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -18,6 +18,13 @@ from app.models.transaction import Transaction, TransactionType
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
 
 router = APIRouter(tags=["web"])
+
+_skill_md_path = Path(__file__).parent.parent / "static" / "skill.md"
+
+
+@router.get("/skill.md", response_class=PlainTextResponse)
+def skill_md():
+    return PlainTextResponse(_skill_md_path.read_text(encoding="utf-8"), media_type="text/markdown")
 
 
 @router.get("/", response_class=HTMLResponse)
