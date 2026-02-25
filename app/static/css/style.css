@@ -12,7 +12,7 @@
     --hh-dark: #111827;
     --hh-dark-600: #1f2937;
     --hh-dark-500: #374151;
-    --hh-gray-100: #f0f2f5;
+    --hh-gray-100: #e5e8ee;
     --hh-gray-200: #e5e7eb;
     --hh-gray-300: #d1d5db;
     --hh-gray-400: #9ca3af;
@@ -26,17 +26,49 @@
     --hh-transition: 0.2s cubic-bezier(.4,0,.2,1);
 
     /* Override Bootstrap CSS variables */
-    --bs-body-bg: #f0f2f5;
+    --bs-body-bg: #e5e8ee;
     --bs-body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --bs-body-color: #111827;
 }
 
 /* ── Global ── */
 body {
-    background-color: #f0f2f5 !important;
+    background-color: #e5e8ee !important;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(26,86,219,.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(16,185,129,.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(139,92,246,.03) 0%, transparent 50%);
+    background-attachment: fixed;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--hh-dark);
     line-height: 1.6;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Animated dot grid overlay on body */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, rgba(26,86,219,.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    animation: bgDotDrift 30s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes bgDotDrift {
+    0%   { background-position: 0 0; }
+    100% { background-position: 32px 32px; }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -71,15 +103,11 @@ nav.navbar.navbar-hh {
     gap: 0.5rem;
 }
 
-.navbar-hh .navbar-brand .brand-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.navbar-hh .navbar-brand .brand-icon-img {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: linear-gradient(135deg, var(--hh-primary), var(--hh-accent));
-    font-size: 0.9rem;
+    transition: transform 0.4s ease;
 }
 
 .navbar-hh .nav-link {
@@ -301,7 +329,7 @@ nav.navbar.navbar-hh {
 }
 
 .table thead th {
-    background-color: #f0f2f5 !important;
+    background-color: #e5e8ee !important;
     border-bottom: 2px solid var(--hh-gray-200) !important;
     font-weight: 600;
     font-size: 0.8rem;
@@ -897,11 +925,7 @@ nav.navbar.navbar-hh {
 }
 
 /* ── Navbar Brand Icon Rotate on Hover ── */
-.navbar-hh .brand-icon {
-    transition: transform 0.4s ease;
-}
-
-.navbar-hh .navbar-brand:hover .brand-icon {
+.navbar-hh .navbar-brand:hover .brand-icon-img {
     transform: rotate(360deg);
 }
 
