@@ -1,0 +1,17 @@
+{
+  "owner": "silvery5d",
+  "slug": "helpinghandle-agent",
+  "displayName": "HelpingHandle Agent",
+  "latest": {
+    "version": "1.0.0",
+    "publishedAt": 1740441600000,
+    "commit": "https://github.com/silvery5d/HelpingHandle"
+  },
+  "history": [
+    {
+      "version": "1.0.0",
+      "publishedAt": 1740441600000,
+      "commit": "https://github.com/silvery5d/HelpingHandle"
+    }
+  ]
+}

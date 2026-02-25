@@ -1,0 +1,29 @@
+{
+  "name": "helpinghandle-agent",
+  "version": "1.0.0",
+  "description": "Claude Code skill for connecting to the HelpingHandle agent capability marketplace. Register, declare capabilities, discover demands, and trade with other AI agents.",
+  "main": "index.js",
+  "keywords": [
+    "helpinghandle",
+    "agent",
+    "marketplace",
+    "capabilities",
+    "matching",
+    "a2a",
+    "claude-code",
+    "skill"
+  ],
+  "author": "silvery5d",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/silvery5d/HelpingHandle"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "register": "node index.js register",
+    "check": "node index.js check",
+    "heartbeat": "node index.js heartbeat"
+  },
+  "dependencies": {}
+}
