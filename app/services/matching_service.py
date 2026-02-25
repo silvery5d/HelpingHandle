@@ -47,6 +47,44 @@ Consider:
 3. Agent status freshness (newer updated_at = more trustworthy)
 4. Geographic proximity (distance_km provided)"""
 
+REVERSE_MATCHING_SYSTEM_PROMPT = """You are a demand matching engine for HelpingHandle, an AI agent platform.
+An agent with certain capabilities wants to find open demands it can fulfill.
+Score how well the agent's capabilities match each candidate demand.
+
+You MUST respond with valid JSON only, no other text.
+
+Response format:
+{
+  "scored_demands": [
+    {
+      "demand_id": "the-uuid",
+      "relevance_score": 0.95,
+      "reasoning": "one sentence explaining why this agent can fulfill this demand"
+    }
+  ]
+}
+
+Scoring guidelines:
+- 0.9-1.0: Agent can perfectly fulfill this demand
+- 0.7-0.89: Agent can mostly fulfill it, maybe missing minor aspects
+- 0.5-0.69: Partial match, agent could help but not ideal
+- 0.3-0.49: Weak match
+- 0.0-0.29: Agent's capabilities are not relevant to this demand
+
+Consider:
+1. Semantic alignment between the agent's capabilities and what the demand asks for
+2. Whether the agent's capability types match the demand's required types
+3. Geographic feasibility (if both have location data)
+4. Bounty amount as a tiebreaker (higher bounty = more attractive)"""
+
+REVERSE_MATCHING_USER_TEMPLATE = """Agent capabilities:
+{capabilities_json}
+
+Open demands to evaluate:
+{demands_json}
+
+Score how well this agent can fulfill each demand."""
+
 MATCHING_USER_TEMPLATE = """Search query: {query}
 
 Candidate capabilities (JSON):
@@ -208,6 +246,160 @@ def semantic_search(
     return {
         "query": query,
         "interpreted_query": claude_result.get("interpreted_query", {}),
+        "results": results,
+        "total_results": len(results),
+        "matching_method": method,
+    }
+
+
+# ── Reverse matching: find demands for an agent ──
+
+
+def _build_demands_list(db: Session, agent: Agent, max_demands: int) -> list[dict]:
+    """Fetch open demands (excluding those posted by the agent itself)."""
+    from app.models.demand import Demand, DemandStatus
+    from app.services.geo_service import haversine_distance
+
+    demands = (
+        db.query(Demand)
+        .filter(Demand.status == DemandStatus.OPEN.value)
+        .filter(Demand.requester_agent_id != agent.id)
+        .order_by(Demand.created_at.desc())
+        .limit(max_demands)
+        .all()
+    )
+
+    result = []
+    for d in demands:
+        dist = None
+        if (
+            agent.latitude is not None
+            and d.location_latitude is not None
+        ):
+            dist = haversine_distance(
+                agent.latitude, agent.longitude,
+                d.location_latitude, d.location_longitude,
+            )
+            if d.location_radius_km and dist > d.location_radius_km:
+                continue  # agent is outside demand's required radius
+
+        result.append({
+            "demand_id": d.id,
+            "description": d.description,
+            "requirements": d.requirements_json,
+            "bounty_amount": d.bounty_amount,
+            "location_latitude": d.location_latitude,
+            "location_longitude": d.location_longitude,
+            "location_radius_km": d.location_radius_km,
+            "distance_km": round(dist, 2) if dist is not None else None,
+            "created_at": d.created_at.isoformat(),
+        })
+    return result
+
+
+def _build_agent_capabilities_summary(db: Session, agent: Agent) -> list[dict]:
+    """Build a summary of the agent's capabilities for the matching prompt."""
+    caps = (
+        db.query(Capability)
+        .filter(Capability.agent_id == agent.id)
+        .all()
+    )
+    return [
+        {
+            "capability_id": c.id,
+            "type": c.type,
+            "description": c.description,
+            "device_info": c.device_info,
+            "status": c.status,
+        }
+        for c in caps
+    ]
+
+
+def _call_claude_for_reverse_matching(capabilities_json: str, demands_json: str) -> dict:
+    """Call Claude API to score demands against agent capabilities."""
+    client = _get_anthropic_client()
+    message = client.messages.create(
+        model=settings.claude_model,
+        max_tokens=settings.claude_max_tokens,
+        system=REVERSE_MATCHING_SYSTEM_PROMPT,
+        messages=[{
+            "role": "user",
+            "content": REVERSE_MATCHING_USER_TEMPLATE.format(
+                capabilities_json=capabilities_json,
+                demands_json=demands_json,
+            ),
+        }],
+    )
+    return json.loads(message.content[0].text)
+
+
+def _fallback_reverse_matching(caps: list[dict], demands: list[dict]) -> dict:
+    """Fallback: simple text similarity between capabilities and demand descriptions."""
+    caps_text = " ".join(
+        f"{c['description']} {c.get('device_info', '')} {c['type']}" for c in caps
+    ).lower()
+
+    scored = []
+    for d in demands:
+        demand_text = d["description"].lower()
+        score = SequenceMatcher(None, caps_text, demand_text).ratio()
+        scored.append({
+            "demand_id": d["demand_id"],
+            "relevance_score": round(score, 3),
+            "reasoning": "Keyword similarity match (fallback)",
+        })
+    return {"scored_demands": scored}
+
+
+def find_demands_for_agent(
+    db: Session,
+    agent: Agent,
+    max_results: int = 10,
+) -> dict:
+    """Reverse semantic search: find open demands that match an agent's capabilities."""
+    caps = _build_agent_capabilities_summary(db, agent)
+    if not caps:
+        return {"results": [], "total_results": 0, "matching_method": "none"}
+
+    candidate_demands = _build_demands_list(
+        db, agent, max_demands=settings.max_prefilter_candidates,
+    )
+    if not candidate_demands:
+        return {"results": [], "total_results": 0, "matching_method": "none"}
+
+    caps_json = json.dumps(caps, ensure_ascii=False, indent=2)
+    demands_json = json.dumps(candidate_demands, ensure_ascii=False, indent=2)
+
+    try:
+        claude_result = _call_claude_for_reverse_matching(caps_json, demands_json)
+        method = "claude"
+    except Exception as e:
+        logger.warning("Claude API failed for reverse matching, using fallback: %s", e)
+        claude_result = _fallback_reverse_matching(caps, candidate_demands)
+        method = "fallback_keyword"
+
+    scored_map = {
+        s["demand_id"]: s for s in claude_result.get("scored_demands", [])
+    }
+
+    results = []
+    for d in candidate_demands:
+        score_info = scored_map.get(d["demand_id"], {})
+        results.append({
+            "demand_id": d["demand_id"],
+            "description": d["description"],
+            "bounty_amount": d["bounty_amount"],
+            "relevance_score": score_info.get("relevance_score", 0),
+            "reasoning": score_info.get("reasoning", ""),
+            "distance_km": d["distance_km"],
+            "created_at": d["created_at"],
+        })
+
+    results.sort(key=lambda r: r["relevance_score"], reverse=True)
+    results = results[:max_results]
+
+    return {
         "results": results,
         "total_results": len(results),
         "matching_method": method,

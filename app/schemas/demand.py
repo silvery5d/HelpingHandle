@@ -47,3 +47,19 @@ class DemandListResponse(BaseModel):
 
 class AcceptRequest(BaseModel):
     agent_id: str
+
+
+class MatchedDemandItem(BaseModel):
+    demand_id: str
+    description: str
+    bounty_amount: float
+    relevance_score: float
+    reasoning: str
+    distance_km: float | None
+    created_at: str
+
+
+class ForMeResponse(BaseModel):
+    results: list[MatchedDemandItem]
+    total_results: int
+    matching_method: str

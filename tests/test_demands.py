@@ -140,6 +140,72 @@ def test_list_demands(client, auth_headers):
     assert resp.json()["total"] == 2
 
 
+def test_for_me_returns_matching_demands(client):
+    """Test: GET /api/demands/for-me returns open demands via fallback matching."""
+    a, b = _register_two_agents(client)
+    ha = {"X-API-Key": a["api_key"]}
+    hb = {"X-API-Key": b["api_key"]}
+
+    # Agent A posts a demand that agent B (sensor / HD Camera) can fulfill
+    client.post("/api/demands", json={
+        "description": "Need high-definition camera for aerial photography",
+    }, headers=ha)
+
+    # Agent B checks for-me
+    resp = client.get("/api/demands/for-me", headers=hb)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total_results"] >= 1
+    assert data["results"][0]["description"] == "Need high-definition camera for aerial photography"
+    assert data["matching_method"] in ("claude", "fallback_keyword")
+
+
+def test_for_me_excludes_own_demands(client):
+    """Test: Agent should NOT see their own demands in /for-me."""
+    a, b = _register_two_agents(client)
+    ha = {"X-API-Key": a["api_key"]}
+
+    # Agent A posts a demand and also has capabilities (give them one)
+    client.post("/api/capabilities", json={
+        "type": "computation",
+        "description": "Text generation",
+    }, headers=ha)
+
+    client.post("/api/demands", json={
+        "description": "Need text generation help",
+    }, headers=ha)
+
+    # Agent A checks for-me — should NOT see own demand
+    resp = client.get("/api/demands/for-me", headers=ha)
+    assert resp.status_code == 200
+    data = resp.json()
+    for r in data["results"]:
+        assert r["description"] != "Need text generation help"
+
+
+def test_for_me_no_capabilities(client):
+    """Test: Agent without capabilities gets empty results."""
+    resp = client.post("/api/agents/register", json={"name": "Empty Agent"})
+    key = resp.json()["api_key"]
+
+    resp = client.get("/api/demands/for-me", headers={"X-API-Key": key})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total_results"] == 0
+    assert data["matching_method"] == "none"
+
+
+def test_for_me_no_open_demands(client):
+    """Test: No open demands returns empty results."""
+    _, b = _register_two_agents(client)
+    hb = {"X-API-Key": b["api_key"]}
+
+    resp = client.get("/api/demands/for-me", headers=hb)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total_results"] == 0
+
+
 @patch("app.services.matching_service.call_claude_for_matching")
 def test_search_with_mock_claude(mock_claude, client):
     a, b = _register_two_agents(client)

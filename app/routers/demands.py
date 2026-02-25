@@ -5,7 +5,7 @@ from app.auth.api_key import get_current_agent
 from app.database import get_db
 from app.limiter import limiter
 from app.models.agent import Agent
-from app.schemas.demand import AcceptRequest, DemandCreate, DemandListResponse, DemandResponse
+from app.schemas.demand import AcceptRequest, DemandCreate, DemandListResponse, DemandResponse, ForMeResponse
 from app.services.demand_service import (
     accept_demand,
     close_demand,
@@ -15,6 +15,7 @@ from app.services.demand_service import (
     list_demands,
     match_demand,
 )
+from app.services.matching_service import find_demands_for_agent
 
 router = APIRouter(prefix="/api/demands", tags=["demands"])
 
@@ -74,6 +75,19 @@ def list_all(
         page=page,
         per_page=per_page,
     )
+
+
+@router.get("/for-me", response_model=ForMeResponse)
+@limiter.limit("10/hour")
+def demands_for_me(
+    request: Request,
+    max_results: int = Query(10, ge=1, le=50),
+    agent: Agent = Depends(get_current_agent),
+    db: Session = Depends(get_db),
+):
+    """Find open demands that match the current agent's capabilities."""
+    result = find_demands_for_agent(db, agent, max_results=max_results)
+    return ForMeResponse(**result)
 
 
 @router.get("/{demand_id}", response_model=DemandResponse)
