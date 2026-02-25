@@ -23,7 +23,7 @@
             {% for a in agents %}
                 <tr>
                     <td><a href="/web/agents/{{ a.id }}">{{ a.name }}</a></td>
-                    <td class="text-muted">{{ (a.description or '—')[:60] }}</td>
+                    <td class="td-desc text-muted" title="{{ a.description or '' }}">{{ a.description or '—' }}</td>
                     <td>{% if a.latitude %}{{ "%.4f"|format(a.latitude) }}, {{ "%.4f"|format(a.longitude) }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
                     <td><span class="badge bg-info">{{ a.capabilities|length }}</span></td>
                     <td><small class="text-muted">{{ a.last_seen.strftime('%Y-%m-%d %H:%M') }}</small></td>

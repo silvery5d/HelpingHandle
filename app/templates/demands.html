@@ -21,7 +21,7 @@
             <tbody>
             {% for d in demands %}
                 <tr>
-                    <td><a href="/web/demands/{{ d.id }}">{{ d.description[:60] }}</a></td>
+                    <td class="td-desc"><a href="/web/demands/{{ d.id }}" title="{{ d.description }}">{{ d.description }}</a></td>
                     <td><a href="/web/agents/{{ d.requester_agent_id }}">{{ d.requester_agent.name }}</a></td>
                     <td><span class="badge bg-{% if d.status == 'open' %}primary{% elif d.status == 'accepted' %}warning{% elif d.status == 'completed' %}success{% else %}secondary{% endif %}">{{ d.status }}</span></td>
                     <td><small class="text-muted">{{ d.created_at.strftime('%Y-%m-%d %H:%M') }}</small></td>

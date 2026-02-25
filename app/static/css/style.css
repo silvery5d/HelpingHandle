@@ -351,6 +351,29 @@ nav.navbar.navbar-hh {
     background-color: var(--hh-primary-light);
 }
 
+/* ── Table Description Cells ── */
+.td-desc {
+    max-width: 420px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.td-device {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Expand on hover to show full text */
+.td-desc:hover,
+.td-device:hover {
+    white-space: normal;
+    overflow: visible;
+    word-break: break-word;
+}
+
 /* ── Badges ── */
 .badge {
     font-weight: 600;

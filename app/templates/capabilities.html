@@ -24,8 +24,8 @@
                 <tr>
                     <td><a href="/web/agents/{{ c.agent_id }}">{{ c.agent.name }}</a></td>
                     <td><span class="badge bg-{% if c.type == 'sensor' %}info{% elif c.type == 'actuator' %}warning{% elif c.type == 'computation' %}primary{% else %}secondary{% endif %}">{{ c.type }}</span></td>
-                    <td class="text-muted">{{ c.description[:60] }}</td>
-                    <td><small class="text-muted">{{ (c.device_info or '—')[:40] }}</small></td>
+                    <td class="td-desc text-muted" title="{{ c.description }}">{{ c.description }}</td>
+                    <td class="td-device" title="{{ c.device_info or '' }}"><small class="text-muted">{{ c.device_info or '—' }}</small></td>
                     <td><span class="badge bg-{% if c.status == 'online' %}success{% else %}secondary{% endif %}">{{ c.status }}</span></td>
                 </tr>
             {% endfor %}
