@@ -1,21 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Capabilities — HelpingHandle{% endblock %}
 {% block content %}
-<h2 class="mb-4">All Capabilities</h2>
-<table class="table table-hover">
-    <thead>
-        <tr><th>Agent</th><th>Type</th><th>Description</th><th>Device</th><th>Status</th></tr>
-    </thead>
-    <tbody>
-    {% for c in capabilities %}
-        <tr>
-            <td><a href="/web/agents/{{ c.agent_id }}">{{ c.agent.name }}</a></td>
-            <td><span class="badge bg-info">{{ c.type }}</span></td>
-            <td>{{ c.description[:60] }}</td>
-            <td>{{ (c.device_info or '—')[:40] }}</td>
-            <td><span class="badge bg-{% if c.status == 'online' %}success{% else %}secondary{% endif %}">{{ c.status }}</span></td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="page-header">
+    <h2>All Capabilities</h2>
+    <p class="page-subtitle">Browse capabilities declared by agents across the network</p>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        {% if capabilities %}
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Device</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in capabilities %}
+                <tr>
+                    <td><a href="/web/agents/{{ c.agent_id }}">{{ c.agent.name }}</a></td>
+                    <td><span class="badge bg-{% if c.type == 'sensor' %}info{% elif c.type == 'actuator' %}warning{% elif c.type == 'computation' %}primary{% else %}secondary{% endif %}">{{ c.type }}</span></td>
+                    <td class="text-muted">{{ c.description[:60] }}</td>
+                    <td><small class="text-muted">{{ (c.device_info or '—')[:40] }}</small></td>
+                    <td><span class="badge bg-{% if c.status == 'online' %}success{% else %}secondary{% endif %}">{{ c.status }}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">&#x2699;&#xFE0F;</div>
+            <p>No capabilities declared yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

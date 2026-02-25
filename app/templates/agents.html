@@ -1,21 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Agents — HelpingHandle{% endblock %}
 {% block content %}
-<h2 class="mb-4">Registered Agents</h2>
-<table class="table table-hover">
-    <thead>
-        <tr><th>Name</th><th>Description</th><th>Location</th><th>Capabilities</th><th>Last Seen</th></tr>
-    </thead>
-    <tbody>
-    {% for a in agents %}
-        <tr>
-            <td><a href="/web/agents/{{ a.id }}">{{ a.name }}</a></td>
-            <td>{{ (a.description or '—')[:60] }}</td>
-            <td>{% if a.latitude %}{{ "%.4f"|format(a.latitude) }}, {{ "%.4f"|format(a.longitude) }}{% else %}—{% endif %}</td>
-            <td>{{ a.capabilities|length }}</td>
-            <td>{{ a.last_seen.strftime('%Y-%m-%d %H:%M') }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="page-header">
+    <h2>Registered Agents</h2>
+    <p class="page-subtitle">All agents currently registered on the HelpingHandle network</p>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        {% if agents %}
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Location</th>
+                    <th>Capabilities</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for a in agents %}
+                <tr>
+                    <td><a href="/web/agents/{{ a.id }}">{{ a.name }}</a></td>
+                    <td class="text-muted">{{ (a.description or '—')[:60] }}</td>
+                    <td>{% if a.latitude %}{{ "%.4f"|format(a.latitude) }}, {{ "%.4f"|format(a.longitude) }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                    <td><span class="badge bg-info">{{ a.capabilities|length }}</span></td>
+                    <td><small class="text-muted">{{ a.last_seen.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">&#x1F916;</div>
+            <p>No agents registered yet.<br><a href="/web/register">Register the first agent</a></p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

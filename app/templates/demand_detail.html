@@ -1,47 +1,86 @@
 {% extends "base.html" %}
 {% block title %}Demand — HelpingHandle{% endblock %}
 {% block content %}
-<h2>Demand</h2>
-<p class="lead">{{ demand.description }}</p>
 
-<div class="row mb-4">
+<nav aria-label="breadcrumb" class="breadcrumb-hh">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/web/demands">Demands</a></li>
+        <li class="breadcrumb-item active">Details</li>
+    </ol>
+</nav>
+
+<div class="page-header">
+    <h2>Demand Details</h2>
+    <p class="page-subtitle">{{ demand.description }}</p>
+</div>
+
+<div class="row g-4 mb-4">
     <div class="col-md-6">
-        <div class="card">
+        <div class="card info-card">
             <div class="card-header">Details</div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Requester: <a href="/web/agents/{{ demand.requester_agent_id }}">{{ demand.requester_agent.name }}</a></li>
-                <li class="list-group-item">Status: <span class="badge bg-{% if demand.status == 'open' %}primary{% elif demand.status == 'accepted' %}warning{% elif demand.status == 'completed' %}success{% else %}secondary{% endif %}">{{ demand.status }}</span></li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Requester</span>
+                    <a href="/web/agents/{{ demand.requester_agent_id }}">{{ demand.requester_agent.name }}</a>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Status</span>
+                    <span class="badge bg-{% if demand.status == 'open' %}primary{% elif demand.status == 'accepted' %}warning{% elif demand.status == 'completed' %}success{% else %}secondary{% endif %}">{{ demand.status }}</span>
+                </li>
                 {% if demand.accepted_agent_id %}
-                <li class="list-group-item">Executor: <a href="/web/agents/{{ demand.accepted_agent_id }}">{{ demand.accepted_agent.name }}</a></li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Executor</span>
+                    <a href="/web/agents/{{ demand.accepted_agent_id }}">{{ demand.accepted_agent.name }}</a>
+                </li>
                 {% endif %}
                 {% if demand.location_latitude %}
-                <li class="list-group-item">Location: {{ "%.4f"|format(demand.location_latitude) }}, {{ "%.4f"|format(demand.location_longitude) }} ({{ "%.1f"|format(demand.location_radius_km) }} km)</li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Location</span>
+                    <span>{{ "%.4f"|format(demand.location_latitude) }}, {{ "%.4f"|format(demand.location_longitude) }} ({{ "%.1f"|format(demand.location_radius_km) }} km)</span>
+                </li>
                 {% endif %}
-                <li class="list-group-item">Created: {{ demand.created_at.strftime('%Y-%m-%d %H:%M') }}</li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Created</span>
+                    <span>{{ demand.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </li>
             </ul>
         </div>
     </div>
     <div class="col-md-6">
         {% if demand.matched_results_json %}
-        <div class="card">
+        <div class="card info-card">
             <div class="card-header">Match Results</div>
             <div class="card-body p-0">
                 <table class="table table-sm mb-0">
-                    <thead><tr><th>Agent</th><th>Capability</th><th>Score</th><th>Distance</th></tr></thead>
+                    <thead>
+                        <tr><th>Agent</th><th>Capability</th><th>Score</th><th>Distance</th></tr>
+                    </thead>
                     <tbody>
                     {% for m in demand.matched_results_json %}
                         <tr>
                             <td><a href="/web/agents/{{ m.agent_id }}">{{ m.agent_name }}</a></td>
-                            <td>{{ m.capability_description[:40] }}</td>
+                            <td><small class="text-muted">{{ m.capability_description[:40] }}</small></td>
                             <td>
-                                <div class="score-bar"><div class="score-bar-fill" style="width: {{ (m.relevance_score * 100)|int }}%"></div></div>
-                                {{ "%.2f"|format(m.relevance_score) }}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="score-bar flex-grow-1"><div class="score-bar-fill" style="width: {{ (m.relevance_score * 100)|int }}%"></div></div>
+                                    <small class="fw-semibold">{{ "%.2f"|format(m.relevance_score) }}</small>
+                                </div>
                             </td>
-                            <td>{% if m.distance_km is not none %}{{ "%.1f"|format(m.distance_km) }} km{% else %}—{% endif %}</td>
+                            <td>{% if m.distance_km is not none %}<small>{{ "%.1f"|format(m.distance_km) }} km</small>{% else %}<span class="text-muted">—</span>{% endif %}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="card info-card">
+            <div class="card-body">
+                <div class="empty-state">
+                    <div class="empty-state-icon">&#x1F50D;</div>
+                    <p>No match results yet.<br><small class="text-muted">Run AI matching via the API to find suitable agents.</small></p>
+                </div>
             </div>
         </div>
         {% endif %}

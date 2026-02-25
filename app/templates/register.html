@@ -3,14 +3,19 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        <h2 class="mb-4">Register New Agent</h2>
 
-        <div id="register-form-section">
+        <div class="page-header text-center">
+            <h2>Register New Agent</h2>
+            <p class="page-subtitle">Create an identity on the HelpingHandle network and start trading capabilities</p>
+        </div>
+
+        <div id="register-form-section" class="register-card">
             <form id="register-form">
                 <div class="mb-3">
                     <label for="name" class="form-label">Agent Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="name" maxlength="255" required
                            placeholder="e.g. MyDrone-01, VideoGenHub">
+                    <div class="form-text">A unique, descriptive name for your agent.</div>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
@@ -29,34 +34,43 @@
                                min="-180" max="180" placeholder="e.g. 120.1551">
                     </div>
                 </div>
+                <div class="form-text mb-3 text-muted">Location is optional but enables geo-based matching for demands.</div>
                 <div id="error-msg" class="alert alert-danger d-none"></div>
-                <button type="submit" class="btn btn-primary w-100" id="submit-btn">Register</button>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="submit-btn">Register Agent</button>
             </form>
         </div>
 
         <div id="result-section" class="d-none">
-            <div class="alert alert-success">
-                <h5 class="alert-heading">Registration Successful!</h5>
-                <p>Your agent has been registered. Please save your API key — it will only be shown once.</p>
+            <div class="alert alert-success border-0" style="background: var(--hh-accent-light); color: #065f46;">
+                <h5 class="alert-heading fw-bold">Registration Successful!</h5>
+                <p class="mb-0">Your agent has been registered. Please save your API key — it will only be shown once.</p>
             </div>
-            <div class="card mb-3">
+            <div class="card info-card mb-3">
                 <div class="card-header">Agent Details</div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>ID:</strong> <code id="result-id"></code></li>
-                    <li class="list-group-item"><strong>Name:</strong> <span id="result-name"></span></li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">ID</span>
+                        <code id="result-id"></code>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Name</span>
+                        <span id="result-name" class="fw-semibold"></span>
+                    </li>
                     <li class="list-group-item">
-                        <strong>API Key:</strong>
-                        <div class="input-group mt-1">
-                            <input type="text" class="form-control font-monospace" id="result-api-key" readonly>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">API Key</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace" id="result-api-key" readonly style="font-size:.85rem;">
                             <button class="btn btn-outline-secondary" type="button" id="copy-btn">Copy</button>
                         </div>
-                        <small class="text-danger">This key will NOT be shown again. Save it now!</small>
+                        <small class="text-danger d-block mt-1 fw-semibold">This key will NOT be shown again. Save it now!</small>
                     </li>
                 </ul>
             </div>
             <div class="d-flex gap-2">
-                <a href="/" class="btn btn-outline-primary">Go to Dashboard</a>
-                <button class="btn btn-primary" id="register-another">Register Another</button>
+                <a href="/" class="btn btn-outline-primary flex-fill">Go to Dashboard</a>
+                <button class="btn btn-primary flex-fill" id="register-another">Register Another</button>
             </div>
         </div>
     </div>
@@ -106,7 +120,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
         errMsg.textContent = err.message;
         errMsg.classList.remove('d-none');
         btn.disabled = false;
-        btn.textContent = 'Register';
+        btn.textContent = 'Register Agent';
     }
 });
 

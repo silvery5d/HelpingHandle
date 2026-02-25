@@ -1,23 +1,43 @@
 {% extends "base.html" %}
 {% block title %}{{ agent.name }} — HelpingHandle{% endblock %}
 {% block content %}
-<h2>{{ agent.name }}</h2>
-<p class="text-muted">{{ agent.description or 'No description' }}</p>
 
-<div class="row mb-4">
+<nav aria-label="breadcrumb" class="breadcrumb-hh">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/web/agents">Agents</a></li>
+        <li class="breadcrumb-item active">{{ agent.name }}</li>
+    </ol>
+</nav>
+
+<div class="page-header">
+    <h2>{{ agent.name }}</h2>
+    <p class="page-subtitle">{{ agent.description or 'No description provided' }}</p>
+</div>
+
+<div class="row g-4 mb-4">
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">Info</div>
+        <div class="card info-card">
+            <div class="card-header">Agent Info</div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Location: {% if agent.latitude %}{{ "%.4f"|format(agent.latitude) }}, {{ "%.4f"|format(agent.longitude) }}{% else %}—{% endif %}</li>
-                <li class="list-group-item">Registered: {{ agent.created_at.strftime('%Y-%m-%d %H:%M') }}</li>
-                <li class="list-group-item">Last seen: {{ agent.last_seen.strftime('%Y-%m-%d %H:%M') }}</li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Location</span>
+                    <span>{% if agent.latitude %}{{ "%.4f"|format(agent.latitude) }}, {{ "%.4f"|format(agent.longitude) }}{% else %}—{% endif %}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Registered</span>
+                    <span>{{ agent.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Last seen</span>
+                    <span>{{ agent.last_seen.strftime('%Y-%m-%d %H:%M') }}</span>
+                </li>
             </ul>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">Status</div>
+        <div class="card info-card">
+            <div class="card-header">Status Reports</div>
             <ul class="list-group list-group-flush">
             {% for s in statuses %}
                 <li class="list-group-item d-flex justify-content-between">
@@ -25,23 +45,29 @@
                     <small class="text-muted">{{ s.updated_at.strftime('%H:%M:%S') }}</small>
                 </li>
             {% else %}
-                <li class="list-group-item text-muted">No status reported</li>
+                <li class="list-group-item">
+                    <span class="text-muted">No status reported</span>
+                </li>
             {% endfor %}
             </ul>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card">
+        <div class="card info-card">
             <div class="card-header">Capabilities ({{ capabilities|length }})</div>
             <ul class="list-group list-group-flush">
             {% for c in capabilities %}
                 <li class="list-group-item">
-                    <span class="badge bg-info">{{ c.type }}</span>
-                    <span class="badge bg-{% if c.status == 'online' %}success{% else %}secondary{% endif %}">{{ c.status }}</span>
-                    {{ c.description[:40] }}
+                    <div class="d-flex gap-1 mb-1">
+                        <span class="badge bg-{% if c.type == 'sensor' %}info{% elif c.type == 'actuator' %}warning{% elif c.type == 'computation' %}primary{% else %}secondary{% endif %}">{{ c.type }}</span>
+                        <span class="badge bg-{% if c.status == 'online' %}success{% else %}secondary{% endif %}">{{ c.status }}</span>
+                    </div>
+                    <small class="text-muted">{{ c.description[:50] }}</small>
                 </li>
             {% else %}
-                <li class="list-group-item text-muted">No capabilities</li>
+                <li class="list-group-item">
+                    <span class="text-muted">No capabilities declared</span>
+                </li>
             {% endfor %}
             </ul>
         </div>
